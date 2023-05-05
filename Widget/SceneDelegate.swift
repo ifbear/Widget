@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -47,9 +48,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
 
         // Save changes in the application's managed object context when the application transitions to the background.
-        (UIApplication.shared.delegate as? AppDelegate)?.saveContext()
+        // (UIApplication.shared.delegate as? AppDelegate)?.saveContext()
     }
 
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let topViewController = UIApplication.topViewController else { return }
+        URLContexts.forEach { URLContext in
+            if let objectID = DataBase.shared.persistentStoreCoordinator.managedObjectID(forURIRepresentation: URLContext.url) {
+                topViewController.navigationController?.pushViewController(EditViewController(objectID: objectID), animated: true)
+            }
+        }
+    }
 
 }
 
