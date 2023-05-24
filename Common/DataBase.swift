@@ -25,7 +25,11 @@ class DataBase {
         guard var storeURL: URL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppSettings.groupID) else {
             fatalError()
         }
-        storeURL.append(component: "sqlite")
+        if #available(iOS 16.0, *) {
+            storeURL.append(component: "sqlite")
+        } else {
+            storeURL.appendPathComponent("sqlite")
+        }
         var objcBool: ObjCBool = false
         if FileManager.default.fileExists(atPath: storeURL.relativePath, isDirectory: &objcBool) == false, objcBool.boolValue == false {
             try? FileManager.default.removeItem(at: storeURL)
@@ -34,7 +38,12 @@ class DataBase {
         guard let modelURL: URL = Bundle.main.url(forResource: "Widget", withExtension: "momd") else { fatalError() }
         guard let model: NSManagedObjectModel = .init(contentsOf: modelURL) else { fatalError() }
         persistentContainer = NSPersistentContainer(name: "Widget", managedObjectModel: model)
-        let description: NSPersistentStoreDescription = .init(url: storeURL.appending(component: "Widget.sqlite"))
+        if #available(iOS 16.0, *) {
+            storeURL = storeURL.appending(component: "Widget.sqlite")
+        } else {
+            storeURL.appendPathComponent("Widget.sqlite")
+        }
+        let description: NSPersistentStoreDescription = .init(url: storeURL)
         description.shouldAddStoreAsynchronously = false
         persistentContainer.persistentStoreDescriptions = [description]
         persistentContainer.loadPersistentStores(completionHandler: { (storeDescription, error) in

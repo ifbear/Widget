@@ -18,6 +18,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let _ = (scene as? UIWindowScene) else { return }
+        if connectionOptions.urlContexts.isEmpty == false {
+            connectionOptions.urlContexts.forEach { URLContext in
+                if let objectID = DataBase.shared.persistentStoreCoordinator.managedObjectID(forURIRepresentation: URLContext.url) {
+                    UIApplication.topViewController?.navigationController?.pushViewController(EditViewController(objectID: objectID), animated: true)
+                }
+            }
+        }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -52,10 +59,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        guard let topViewController = UIApplication.topViewController else { return }
         URLContexts.forEach { URLContext in
             if let objectID = DataBase.shared.persistentStoreCoordinator.managedObjectID(forURIRepresentation: URLContext.url) {
-                topViewController.navigationController?.pushViewController(EditViewController(objectID: objectID), animated: true)
+                UIApplication.topViewController?.navigationController?.pushViewController(EditViewController(objectID: objectID), animated: true)
             }
         }
     }
